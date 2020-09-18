@@ -1,6 +1,6 @@
 const { override, fixBabelImports, addLessLoader, addWebpackAlias } = require('customize-cra')
 const path = require('path')
-const theme = require('./custom-antd-theme')
+const theme = require('./custom-antd-theme') // 自定义主题文件
 
 function resolve (dir) {
   return path.join(__dirname, '.', dir)
@@ -22,5 +22,4 @@ module.exports = override(
   addWebpackAlias({
     '@': resolve('src')
   }),
-
 )
