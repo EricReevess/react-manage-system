@@ -1,7 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Button, Card, Input, Select, Space, Table } from 'antd'
+import { Button, Card, Input, Select, Space, Table, message } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
-import { getCategoriesRequest, getCategoryRequest, getProductListRequest, searchProductRequest } from '../../api'
+import {
+  getCategoriesRequest,
+  getCategoryRequest,
+  getProductListRequest,
+  searchProductRequest, updateProductStatusRequest
+} from '../../api'
 import ProductAddUpdate from './product-add-update'
 import ProductDetail from './product-detail'
 
@@ -125,7 +130,6 @@ const ProductList = () => {
         category.isLeaf = true
       }
     })
-    console.log(options)
     setCategories(options)
   }
 
@@ -166,6 +170,19 @@ const ProductList = () => {
     setIsLoading(false)
   }
 
+  // 更新商品上下架状态
+  const changeProductState =  (render) => {
+    const {_id:productId, status} = render
+    updateProductStatusRequest(productId, !status).then(({ data }) => {
+      if (data.status === 0){
+        message.success(`商品${status ? '下架' : '上架'}成功`)
+        getProductList()
+      }else{
+        message.error(data.msg)
+      }
+    })
+  }
+
   // 列头信息
   const columns = [{
     title: '商品名称', dataIndex: 'name', key: 'name',width: 180
@@ -187,8 +204,8 @@ const ProductList = () => {
         updateProductInfo(render)
       }}>修改</Button>
       <Button onClick={() => {
-
-      }}>下架</Button>
+        changeProductState(render)
+      }}>{render.status ? '下架' : '上架'}</Button>
     </Space>)
   }]
 

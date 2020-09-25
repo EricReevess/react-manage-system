@@ -52,6 +52,9 @@ const addProductRequest = newProductInfo =>
 const updateProductRequest = editedProductInfo =>
   ajax('POST', '/manage/product/update', editedProductInfo)
 
+const updateProductStatusRequest = (productId, status) =>
+  ajax('POST', '/manage/product/updateStatus', {productId, status})
+
 const deleteImageRequest = name =>
   ajax('POST','/manage/img/delete', {name})
 
@@ -67,6 +70,7 @@ export {
   deleteImageRequest,
   addProductRequest,
   getCategoryRequest,
-  updateProductRequest
+  updateProductRequest,
+  updateProductStatusRequest
 }
 
