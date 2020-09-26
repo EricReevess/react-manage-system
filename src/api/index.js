@@ -58,6 +58,14 @@ const updateProductStatusRequest = (productId, status) =>
 const deleteImageRequest = name =>
   ajax('POST','/manage/img/delete', {name})
 
+const getRolesRequest = () =>
+  ajax('GET', '/manage/role/list')
+
+const addRoleRequest = roleName =>
+  ajax('POST', '/manage/role/add', {roleName})
+
+const updateRoleRequest = role =>
+  ajax('POST', '/manage/role/update', role)
 
 export {
   loginRequest,
@@ -71,6 +79,9 @@ export {
   addProductRequest,
   getCategoryRequest,
   updateProductRequest,
-  updateProductStatusRequest
+  updateProductStatusRequest,
+  getRolesRequest,
+  addRoleRequest,
+  updateRoleRequest
 }
 

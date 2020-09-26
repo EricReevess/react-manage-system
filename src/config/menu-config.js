@@ -2,21 +2,25 @@ const menuConfig = [
   {
     title:'首页',
     path:'/home',
+    key:'/home',
     icon:'HomeOutlined',
   },
   {
     title:'商品',
     path:'/products',
+    key:'/products',
     icon:'ShopOutlined',
     children:[
       {
         title:'分类管理',
         path:'/products/category',
+        key:'/products/category',
         icon:'OrderedListOutlined',
       },
       {
         title:'商品管理',
         path:'/products/product',
+        key:'/products/product',
         icon:'BarcodeOutlined',
       }
     ]
@@ -24,33 +28,39 @@ const menuConfig = [
   {
     title:'用户管理',
     path:'/user',
+    key:'/user',
     icon:'TeamOutlined',
 
   },
   {
     title:'角色管理',
     path:'/role',
+    key:'/role',
     icon:'UserOutlined',
   },
   {
     title:'统计图表',
     path:'/charts',
+    key:'/charts',
     icon:'AreaChartOutlined',
     children:[
       {
         title:'柱状图',
         path:'/charts/bar',
+        key:'/charts/bar',
         icon:'BarChartOutlined',
       },
       {
         title:'折线图',
         path:'/charts/line',
+        key:'/charts/line',
         icon:'LineChartOutlined',
 
       },
       {
         title:'饼图',
         path:'/charts/pie',
+        key:'/charts/pie',
         icon:'PieChartOutlined',
 
       }
