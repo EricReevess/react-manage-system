@@ -36,7 +36,9 @@ function ajax (method = 'GET', url = '', data = {}) {
     promise.then(response => {
       resolve(response)
       //处理错误的请求
-    }).catch()
+    }).catch(error => {
+      console.log(error)
+    })
   })
 
 

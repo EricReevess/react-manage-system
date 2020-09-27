@@ -112,13 +112,13 @@ const User = () => {
 
   const initUserList = useCallback(() => {
     getUserList()
-    return () => {
-      cancel()
-    }
   }, [])
 
   useEffect(() => {
     initUserList()
+    return () => {
+      cancel()
+    }
   },[initUserList])
 
   return (<Card title={title}
