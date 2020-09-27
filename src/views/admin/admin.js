@@ -1,6 +1,6 @@
 import React from 'react'
 import tempMemoryUtil from '../../utils/tempMemoryUtil'
-import { Redirect, useHistory } from 'react-router-dom'
+import { Redirect, useHistory,useLocation } from 'react-router-dom'
 import SiderNav from '../../components/sider-menu'
 import localStorageUtil from '../../utils/localStorageUtil'
 import { Layout, message } from 'antd'
@@ -11,6 +11,13 @@ import './admin.less'
 
 const Admin = () => {
   let history = useHistory()
+  let location = useLocation()
+  const { userInfo } = tempMemoryUtil
+  const permissionMenus = userInfo.role.menus
+  if(permissionMenus.indexOf(location.pathname) === -1 ){
+    history.replace('/home')
+    message.error('您无权访问此页面')
+  }
 
   const logout = () => {
     localStorageUtil.removeData('userInfo')
@@ -19,7 +26,7 @@ const Admin = () => {
     history.replace('/login')
   }
 
-  const { userInfo } = tempMemoryUtil
+
 
   if (!userInfo || !userInfo._id) {
     return <Redirect to="/login"/>

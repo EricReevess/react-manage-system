@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { Card, Button, Table, Modal, Input, Space, message,Tree } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
-import { addRoleRequest, getRolesRequest, updateRoleRequest } from '../../api'
+import { addRoleRequest, cancel, deleteRoleRequest, getRolesRequest, updateRoleRequest } from '../../api'
 import menuConfig from '../../config/menu-config'
 import localStorageUtil from '../../utils/localStorageUtil'
 
@@ -14,6 +14,7 @@ const Role = () => {
   const [updateRoleVisible, setUpdateRoleVisible] = useState(false)
   const [updateRoleLoading, setUpdateRoleLoading] = useState(false)
   const [currentRole, setCurrentRole] = useState('')
+  const [deleteVisible, setDeleteVisible] = useState(false)
   // 列头信息
   const columns = [{
     title: '角色名称', dataIndex: 'name', key: 'name',
@@ -35,6 +36,9 @@ const Role = () => {
         setUpdateRoleVisible(true)
         setCurrentRole(render)
       }}>更改权限</Button>
+      <Button onClick={() => {
+        deleteRole(render)
+      }}>删除</Button>
     </Space>), width: 100
   }]
   const title = (<div>
@@ -48,6 +52,23 @@ const Role = () => {
         创建角色
       </Button>
     </div>)
+
+  const deleteRole = (render) => {
+    setDeleteVisible(true)
+    setCurrentRole(render)
+  }
+
+  const handleDeleteOk =  () => {
+    deleteRoleRequest(currentRole._id).then(result => {
+      if (result.data.status === 0){
+        message.success('角色删除成功')
+      } else {
+        message.error(result.data.msg)
+      }
+      setDeleteVisible(false)
+    })
+    getRoleList()
+  }
 
   const onCheck = (checkedKeys) => {
     setCurrentRole(prevState => ({
@@ -89,6 +110,9 @@ const Role = () => {
 
   const handleUpdateRole = async () => {
     setUpdateRoleLoading(true)
+    const current = currentRole
+    current.menus.push('/')
+    setCurrentRole(current)
     const auth_name = localStorageUtil.getData('userInfo').username
     const { data: result } = await updateRoleRequest({ ...currentRole,auth_name })
     if (result.status === 0) {
@@ -108,16 +132,14 @@ const Role = () => {
     setUpdateRoleVisible(false)
   }
 
-  const formatDate = (ms) => {
-    const date = new Date(ms)
-    return [date.getFullYear(),date.getMonth()+1,date.getDay()].join('-') + ' ' +
-      [date.getHours(),date.getMinutes(),date.getSeconds()].join(':')
-  }
 
   const initRoleList = useCallback(getRoleList, [])
 
   useEffect(() => {
     initRoleList()
+    return () => {
+      cancel()
+    }
   }, [initRoleList])
 
 
@@ -147,6 +169,16 @@ const Role = () => {
         addonBefore={<span>角色名：</span>}
         placeholder="请输入角色"
       />
+    </Modal>
+    <Modal
+      title="确定删除"
+      visible={deleteVisible}
+      okText="确定"
+      cancelText="取消"
+      onOk={handleDeleteOk}
+      onCancel={() => {setDeleteVisible(false)}}
+    >
+      <p>确定要删除该用户吗？</p>
     </Modal>
     <Modal
       title={`更改角色 ${currentRole.name} 的权限`}

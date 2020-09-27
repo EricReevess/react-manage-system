@@ -2,10 +2,11 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Button, Card, Input, Select, Space, Table, message } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import {
-  getCategoriesRequest,
+  cancel, getCategoriesRequest,
   getCategoryRequest,
   getProductListRequest,
-  searchProductRequest, updateProductStatusRequest
+  searchProductRequest,
+  updateProductStatusRequest
 } from '../../api'
 import ProductAddUpdate from './product-add-update'
 import ProductDetail from './product-detail'
@@ -233,11 +234,15 @@ const ProductList = () => {
   )
   // 初始化分类列表
   const initCategories = useCallback(getCategories,[])
+  const initProductList = useCallback(getProductList,[])
   // 生命周期
   useEffect(() => {
-    getProductList()
+    initProductList()
     initCategories()
-  },[initCategories])
+    return () => {
+      cancel()
+    }
+  },[initCategories,initProductList])
 
   return (<Card title={cardTitle}
                 extra={extra}
@@ -269,7 +274,7 @@ const ProductList = () => {
     />
     <ProductDetail
       onClose={detailDrawerClose}
-      drawerVisible={detailDrawerVisible}
+        drawerVisible={detailDrawerVisible}
       productDetailInfo={productDetailInfo}
     />
   </Card>)

@@ -1,7 +1,7 @@
 /*
 * 网络接口模块
 * 返回值均为Promise对象*/
-import ajax from './ajax'
+import { ajax,cancel } from './ajax'
 import jsonp from 'jsonp'
 import { message } from 'antd'
 
@@ -67,6 +67,21 @@ const addRoleRequest = roleName =>
 const updateRoleRequest = role =>
   ajax('POST', '/manage/role/update', role)
 
+const deleteRoleRequest = roleId =>
+  ajax('POST', '/manage/role/delete', {roleId})
+
+const getUsersRequest = () =>
+  ajax('GET', '/manage/user/list')
+
+const addUserRequest = (user) =>
+  ajax('POST' ,'/manage/user/add', user)
+
+const updateUserRequest = (user) =>
+  ajax('POST', '/manage/user/update', user)
+
+const deleteUserRequest = (userId) =>
+  ajax('POST', '/manage/user/delete', { userId })
+
 export {
   loginRequest,
   weatherRequest,
@@ -82,6 +97,13 @@ export {
   updateProductStatusRequest,
   getRolesRequest,
   addRoleRequest,
-  updateRoleRequest
+  updateRoleRequest,
+  deleteRoleRequest,
+  getUsersRequest,
+  addUserRequest,
+  updateUserRequest,
+  deleteUserRequest,
+  cancel
+
 }
 

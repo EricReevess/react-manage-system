@@ -5,6 +5,7 @@ import * as Icon from '@ant-design/icons'
 import './index.less'
 import { Link } from 'react-router-dom'
 import menuList from '../../config/menu-config'
+import tempMemoryUtil from '../../utils/tempMemoryUtil'
 
 const { SubMenu, Item } = Menu
 const { Sider } = Layout
@@ -17,23 +18,27 @@ const SiderMenu = () => {
   }
 
   const getMenuItems = (menuList) => {
+    const permittedMenus =  tempMemoryUtil.userInfo.role.menus
     return menuList.map(item => {
-      if (item.hasOwnProperty('children') && item.children.length) {
-        return (
-          <SubMenu key={item.path} icon={React.createElement(Icon[item.icon])} title={item.title}>
-            {getMenuItems(item.children)}
-          </SubMenu>
-        )
+      if (permittedMenus.indexOf(item.path) !== -1){
+        if (item.hasOwnProperty('children') && item.children.length) {
+          return (
+            <SubMenu key={item.path} icon={React.createElement(Icon[item.icon])} title={item.title}>
+              {getMenuItems(item.children)}
+            </SubMenu>
+          )
+        } else {
+          return (
+            <Item icon={React.createElement(Icon[item.icon])} key={item.path}>
+              <Link to={item.path}>
+                {item.title}
+              </Link>
+            </Item>
+          )
+        }
       } else {
-        return (
-          <Item icon={React.createElement(Icon[item.icon])} key={item.path}>
-            <Link to={item.path}>
-              {item.title}
-            </Link>
-          </Item>
-        )
+        return null
       }
-
     })
   }
 

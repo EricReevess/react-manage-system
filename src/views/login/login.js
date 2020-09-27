@@ -25,6 +25,7 @@ const Login = () => {
       message.success('登陆成功！')
       localStorageUtil.saveData('userInfo', responseData.data)
       tempMemoryUtil.userInfo = responseData.data
+      console.log(tempMemoryUtil.userInfo)
       history.replace('/')
     }
 

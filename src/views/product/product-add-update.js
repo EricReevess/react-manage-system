@@ -97,7 +97,7 @@ let ProductAddUpdate = (props) => {
 
 
   return (<Drawer
-    title="新增商品"
+    title={submitType === 'add' ? '新增商品' : '修改商品'}
     width={720}
     destroyOnClose
     maskClosable={false}

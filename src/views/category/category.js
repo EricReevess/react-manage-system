@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { Button, Card, Input, Modal, Space, Table, message, Breadcrumb } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import {
-  addCategoryRequest, getCategoriesRequest, updateCategoryRequest
+  addCategoryRequest, cancel, getCategoriesRequest, updateCategoryRequest
 } from '../../api'
 const {Item} = Breadcrumb
 
@@ -108,22 +108,20 @@ const Category = () => {
     setCategoryTitleInfo(prevState => prevState.slice(0,index + 1))
   }
 
-  const getCategoryList =  () => {
+  const getCategoryList = async () => {
     setSubCategoryList([])
     setIsLoading(true)
-    getCategoriesRequest(parentId).then(value => {
-      const { data: result } = value
-      if (result.status === 0) {
-        if (parentId === 0) {
-          setCategoryList(result.data)
-        } else{
-          setSubCategoryList(result.data)
-        }
-      } else {
-        message.error('获取分类数据列表失败')
+    const {data:result} = await getCategoriesRequest(parentId)
+    if (result.status === 0) {
+      if (parentId === 0) {
+        setCategoryList(result.data)
+      } else{
+        setSubCategoryList(result.data)
       }
-      setIsLoading(false)
-    })
+    } else {
+      message.error('获取分类数据列表失败')
+    }
+    setIsLoading(false)
   }
 
   const addCategory = async (newCategoryInfo) => {
@@ -147,12 +145,15 @@ const Category = () => {
     }
   }
 
-  const initCategoryList = useCallback(getCategoryList,[])
+  const initCategoryList = useCallback(getCategoryList,[parentId])
 
   // 生命周期
   useEffect(() => {
     initCategoryList()
-  }, [parentId,initCategoryList])
+    return () => {
+      cancel()
+    }
+  }, [initCategoryList])
 
   return (
     <Card title={categoryTitle}
