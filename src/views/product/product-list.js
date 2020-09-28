@@ -29,7 +29,7 @@ const ProductList = () => {
   const [searchType, setSearchType] = useState('productName')
   const [confirmLoading, setConfirmLoading,] = useState(false)
   const [categories, setCategories,] = useState([])
-
+  const [currentPageNum, setCurrentPageNum,] = useState(1)
 
   const getProductInfo = async (render) => {
     const {name,desc,price,imgs,detail,categoryId,pCategoryId} = render
@@ -71,7 +71,8 @@ const ProductList = () => {
   }
 
 
-  const getProductList =  (pageNum=1) => {
+  const getProductList =  (pageNum = 1) => {
+    setCurrentPageNum(prevState => prevState !== pageNum ? pageNum : prevState)
     setIsLoading(true)
     getProductListRequest(pageNum, 5).then(value => {
       const { data:result } = value
@@ -167,6 +168,7 @@ const ProductList = () => {
       const {total, list} = result.data
       setTotal(total)
       setProductList(list)
+      setCurrentPageNum(1)
     }
     setIsLoading(false)
   }
@@ -177,7 +179,7 @@ const ProductList = () => {
     updateProductStatusRequest(productId, !status).then(({ data }) => {
       if (data.status === 0){
         message.success(`商品${status ? '下架' : '上架'}成功`)
-        getProductList()
+        getProductList(currentPageNum)
       }else{
         message.error(data.msg)
       }
@@ -190,7 +192,7 @@ const ProductList = () => {
   }, {
     title: '商品描述', dataIndex: 'desc', key: 'desc'
   }, {
-    title: '价格', dataIndex: 'price', key: 'price',width: 90, render: price => '￥ '+ price
+    title: '价格', dataIndex: 'price', key: 'price',width: 100, render: price => '￥ '+ price
   },{
     title: '状态', dataIndex: 'status', key: 'status',width: 75, render:(text, render) => (
       render.status ? '已上架' : '已下架'
@@ -240,7 +242,9 @@ const ProductList = () => {
     initProductList()
     initCategories()
     return () => {
-      cancel()
+      if (cancel){
+        cancel()
+      }
     }
   },[initCategories,initProductList])
 
@@ -254,6 +258,7 @@ const ProductList = () => {
       columns={columns}
       loading={isLoading}
       pagination={{
+        current:currentPageNum,
         total ,
         position: ['bottomCenter'],
         defaultPageSize: 5,
@@ -266,6 +271,7 @@ const ProductList = () => {
       onClose={addDrawerClose}
       confirmLoading={confirmLoading}
       getProductList={getProductList}
+      currentPageNum={currentPageNum}
       setConfirmLoading={value => setConfirmLoading(value) }
       categories={categories}
 /*

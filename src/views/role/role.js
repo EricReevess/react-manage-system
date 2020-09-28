@@ -1,11 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { Card, Button, Table, Modal, Input, Space, message,Tree } from 'antd'
+import { useHistory } from 'react-router-dom'
+import { Button, Card, Input, message, Modal, Space, Table, Tree } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { addRoleRequest, cancel, deleteRoleRequest, getRolesRequest, updateRoleRequest } from '../../api'
 import menuConfig from '../../config/menu-config'
 import localStorageUtil from '../../utils/localStorageUtil'
+import tempMemoryUtil from '../../utils/tempMemoryUtil'
 
 const Role = () => {
+  let history = useHistory()
   const [roleList, setRoleList] = useState([])
   const [tableLoading, setTableLoading] = useState(false)
   const [addRoleVisible, setAddRoleVisible] = useState(false)
@@ -110,14 +113,19 @@ const Role = () => {
 
   const handleUpdateRole = async () => {
     setUpdateRoleLoading(true)
-    const current = currentRole
-    current.menus.push('/')
-    setCurrentRole(current)
+    setCurrentRole(currentRole)
     const auth_name = localStorageUtil.getData('userInfo').username
     const { data: result } = await updateRoleRequest({ ...currentRole,auth_name })
     if (result.status === 0) {
-      getRoleList()
-      message.success('更新角色权限成功')
+      if (currentRole._id === tempMemoryUtil.userInfo.role_id){
+        tempMemoryUtil.userInfo = {}
+        localStorageUtil.removeData('userInfo')
+        history.go('/login')
+        message.info('当前用户角色权限更新，请重新登录')
+      } else {
+        message.success('更新角色权限成功')
+        getRoleList()
+      }
     } else {
       message.error('更新角色权限失败，请重试')
     }
@@ -138,7 +146,9 @@ const Role = () => {
   useEffect(() => {
     initRoleList()
     return () => {
-      cancel()
+      if (cancel){
+        cancel()
+      }
     }
   }, [initRoleList])
 

@@ -151,7 +151,9 @@ const Category = () => {
   useEffect(() => {
     initCategoryList()
     return () => {
-      cancel()
+      if (cancel){
+        cancel()
+      }
     }
   }, [initCategoryList])
 

@@ -5,9 +5,15 @@ import { addProductRequest, updateProductRequest } from '../../api/'
 import PicturesWall from './pictures-wall'
 const { TextArea } = Input
 
-let ProductAddUpdate = (props) => {
+let ProductAddUpdate = ({ onClose,
+                          drawerVisible,
+                          confirmLoading,
+                          setConfirmLoading,
+                          getProductList,
+                          currentPageNum,
+                          categories,
+                          updateRef }) => {
   const fileRef = useRef(null)
-  const { updateRef } = props;
   const [productId, setProductId] = useState('')
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
@@ -46,7 +52,7 @@ let ProductAddUpdate = (props) => {
 
   // 提交信息
   const handleSubmit = async values => {
-    props.setConfirmLoading(true)
+    setConfirmLoading(true)
     const imgs = getFileName()
     const categoryId = values.category[values.category.length -1]
     const pCategoryId = values.category[values.category.length -2] || 0
@@ -65,11 +71,11 @@ let ProductAddUpdate = (props) => {
       const {data:result} = await addProductRequest(newProductInfo)
       if (result.status === 0){
         message.success('添加成功')
-        props.onClose()
-        props.getProductList()
+        onClose()
+        getProductList(currentPageNum)
       } else {
         message.error('添加失败，请重试')
-        props.setConfirmLoading(false)
+        setConfirmLoading(false)
       }
     } else {
       const editedProductInfo = {
@@ -85,11 +91,11 @@ let ProductAddUpdate = (props) => {
       const { data:result } = await updateProductRequest(editedProductInfo)
       if (result.status === 0){
         message.success('商品信息修改成功')
-        props.onClose()
-        props.getProductList()
+        onClose()
+        getProductList(currentPageNum)
       } else {
         message.error('商品信息修改失败，请重试')
-        props.setConfirmLoading(false)
+        setConfirmLoading(false)
       }
     }
   }
@@ -101,8 +107,8 @@ let ProductAddUpdate = (props) => {
     width={720}
     destroyOnClose
     maskClosable={false}
-    onClose={props.onClose}
-    visible={props.drawerVisible}
+    onClose={onClose}
+    visible={drawerVisible}
     bodyStyle={{ paddingBottom: 80 }}
   >
     <Form layout="vertical"
@@ -169,7 +175,7 @@ let ProductAddUpdate = (props) => {
           >
             <Cascader
               placeholder="请选择商品分类"
-              options={props.categories}
+              options={categories}
               changeOnSelect
             />
           </Form.Item>
@@ -207,11 +213,11 @@ let ProductAddUpdate = (props) => {
       <Row gutter={16}>
         <Col span={24}>
           <Form.Item>
-            <Button loading={props.confirmLoading} htmlType="submit" style={{ marginRight: 8 }} type="primary">
+            <Button loading={confirmLoading} htmlType="submit" style={{ marginRight: 8 }} type="primary">
               提交
             </Button>
 
-            <Button onClick={props.onClose} >
+            <Button onClick={onClose} >
               取消
             </Button>
           </Form.Item>
@@ -227,6 +233,7 @@ ProductAddUpdate.propTypes = {
   confirmLoading: PropTypes.bool.isRequired,
   setConfirmLoading: PropTypes.func.isRequired,
   getProductList: PropTypes.func.isRequired,
+  currentPageNum:PropTypes.number.isRequired,
   categories:PropTypes.array.isRequired,
 /*
   loadCategoryData:PropTypes.func.isRequired

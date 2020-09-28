@@ -18,7 +18,6 @@ let UserAddUpdate = (props) => {
   useImperativeHandle(userRef, () => ({
     setUserInfo, setSubmitType
   }))
-
   // 更新User
   const setUserInfo = (render) => {
     const { _id, username, email, phone, role_id } = render

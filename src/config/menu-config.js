@@ -4,6 +4,7 @@ const menuConfig = [
     path:'/home',
     key:'/home',
     icon:'HomeOutlined',
+    isPublic:true
   },
   {
     title:'商品',

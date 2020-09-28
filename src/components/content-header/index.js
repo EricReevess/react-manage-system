@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { Button, Layout, Modal } from 'antd'
 import PropTypes from 'prop-types'
 import tempMemoryUtil from '../../utils/tempMemoryUtil'
 import formattedDateUtil from '../../utils/formattedDateUtil'
-import { weatherRequest } from '../../api'
+import { cancel, weatherRequest } from '../../api'
 import menuConfig from '../../config/menu-config'
 import './index.less'
 import LoadingOutlined from '@ant-design/icons/lib/icons/LoadingOutlined'
@@ -15,11 +15,7 @@ const ContentHeader = (props) => {
   const [localDate] = useState(formattedDateUtil(new Date()))
   const [weatherInfo, setWeatherInfo] = useState({})
   const [visible, setVisible] = useState(false)
-  useEffect(() => {
-    getWeatherInfo('成都').then(value => {
-      setWeatherInfo(value)
-    })
-  }, [])
+
 
   const getWeatherInfo = async (location) => {
     return await weatherRequest(location)
@@ -52,6 +48,20 @@ const ContentHeader = (props) => {
   const handleCancel = () => {
     setVisible(false)
   }
+
+  const initWeatherInfo = useCallback(()=> {
+    getWeatherInfo('成都').then(value => {
+      setWeatherInfo(value)
+    })
+  },[])
+
+  useEffect(() => {
+    initWeatherInfo()
+    if (cancel){
+      console.log('cancel')
+      cancel()
+    }
+  }, [initWeatherInfo])
   return (<div>
     <Header
       className="content-header">

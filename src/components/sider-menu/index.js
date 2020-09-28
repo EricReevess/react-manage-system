@@ -17,7 +17,7 @@ const SiderMenu = () => {
     setCollapsed(collapsed)
   }
 
-  const getMenuItems = (menuList) => {
+/*  const getMenuItems = () => {
     const permittedMenus =  tempMemoryUtil.userInfo.role.menus
     return menuList.map(item => {
       if (permittedMenus.indexOf(item.path) !== -1){
@@ -40,6 +40,44 @@ const SiderMenu = () => {
         return null
       }
     })
+  }*/
+
+  const hasAuth = (item) => {
+    const {path,isPublic} = item
+    const menus = tempMemoryUtil.userInfo.role.menus
+
+    if (isPublic || menus.indexOf(path) !== -1){
+      return true
+    } else if (item.children) {
+      return !!item.children.find(item => menus.indexOf(item.path) !== -1)
+    }
+    return false
+  }
+
+  const getMenus = (menuList) => {
+    return menuList.reduce((pre, item) => {
+
+      if (hasAuth(item)){
+        if (!item.children) {
+          pre.push((
+            <Item icon={React.createElement(Icon[item.icon])} key={item.path}>
+              <Link to={item.path}>
+                {item.title}
+              </Link>
+            </Item>
+          ))
+        } else {
+          pre.push((
+            <SubMenu key={item.path} icon={React.createElement(Icon[item.icon])} title={item.title}>
+              {getMenus(item.children)}
+            </SubMenu>
+          ))
+        }
+
+      }
+      return pre
+
+    },[])
   }
 
   const defaultOpenKey = location.pathname.match(/\/\w+/) ? location.pathname.match(/\/\w+/)[0] : '/home'
@@ -56,7 +94,7 @@ const SiderMenu = () => {
         focusable
         defaultOpenKeys={[defaultOpenKey]}
         mode="inline">
-        {getMenuItems(menuList)}
+        {getMenus(menuList)}
       </Menu>
     </Sider>)
 }

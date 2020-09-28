@@ -18,6 +18,7 @@ axiosInstance.interceptors.request.use(config => {
   return Promise.reject(error)
 })
 
+
 function ajax (method = 'GET', url = '', data = {}) {
 
   return new Promise((resolve) => {
@@ -40,7 +41,6 @@ function ajax (method = 'GET', url = '', data = {}) {
       console.log(error)
     })
   })
-
 
 }
 

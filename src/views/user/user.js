@@ -117,7 +117,9 @@ const User = () => {
   useEffect(() => {
     initUserList()
     return () => {
-      cancel()
+      if (cancel){
+        cancel()
+      }
     }
   },[initUserList])
 
