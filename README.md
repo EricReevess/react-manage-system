@@ -49,10 +49,11 @@ src
 
 ### `npm start`
 
-载开发模式下运行React App
+在开发模式下运行React App
 访问 [http://localhost:5000](http://localhost:5000)
+
+打包项目：
 
 ### `npm run build`
 
-打包项目为生产版本
 
