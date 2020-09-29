@@ -5,14 +5,18 @@ import * as Icon from '@ant-design/icons'
 import './index.less'
 import { Link } from 'react-router-dom'
 import menuList from '../../config/menu-config'
-import tempMemoryUtil from '../../utils/tempMemoryUtil'
+import { connect } from 'react-redux'
+import { setNavTitle } from '../../redux/actions'
 
 const { SubMenu, Item } = Menu
 const { Sider } = Layout
 
-const SiderMenu = () => {
+const SiderMenu = ({setNavTitle,userInfo}) => {
   let location = useLocation()
   const [collapsed, setCollapsed] = useState(false)
+  const defaultOpenKey = location.pathname.match(/\/\w+/) ? location.pathname.match(/\/\w+/)[0] : '/home'
+  const selectedKey = location.pathname
+
   const onCollapse = collapsed => {
     setCollapsed(collapsed)
   }
@@ -44,7 +48,7 @@ const SiderMenu = () => {
 
   const hasAuth = (item) => {
     const {path,isPublic} = item
-    const menus = tempMemoryUtil.userInfo.role.menus
+    const menus = userInfo.role.menus
 
     if (isPublic || menus.indexOf(path) !== -1){
       return true
@@ -56,12 +60,15 @@ const SiderMenu = () => {
 
   const getMenus = (menuList) => {
     return menuList.reduce((pre, item) => {
-
       if (hasAuth(item)){
         if (!item.children) {
+          if (item.path === selectedKey){
+            setNavTitle(item.title)
+          }
           pre.push((
-            <Item icon={React.createElement(Icon[item.icon])} key={item.path}>
-              <Link to={item.path}>
+            <Item icon={React.createElement(Icon[item.icon])}
+                  key={item.path}>
+              <Link to={item.path} onClick={() => setNavTitle(item.title)}>
                 {item.title}
               </Link>
             </Item>
@@ -80,8 +87,7 @@ const SiderMenu = () => {
     },[])
   }
 
-  const defaultOpenKey = location.pathname.match(/\/\w+/) ? location.pathname.match(/\/\w+/)[0] : '/home'
-  const selectedKey = location.pathname
+
 
   return (
     <Sider collapsible collapsed={collapsed} onCollapse={onCollapse}>
@@ -100,4 +106,7 @@ const SiderMenu = () => {
 }
 
 
-export default SiderMenu
+export default connect(
+  state => ({userInfo: state.userInfo }),
+  {setNavTitle}
+)(SiderMenu)

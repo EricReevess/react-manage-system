@@ -1,33 +1,19 @@
 import React from 'react'
 import './login.less'
 import 'font-awesome/css/font-awesome.css'
-import { Redirect, useHistory } from 'react-router-dom'
-import { Form, Input, Button, message, Checkbox } from 'antd'
+import { Redirect } from 'react-router-dom'
+import { Form, Input, Button, Checkbox } from 'antd'
 import {
   UserOutlined, LockOutlined
 } from '@ant-design/icons'
-import { loginRequest } from '../../api'
-import localStorageUtil from '../../utils/localStorageUtil'
-import tempMemoryUtil from '../../utils/tempMemoryUtil'
+import { connect } from 'react-redux'
+import { login } from '../../redux/actions'
 
-const Login = () => {
+const Login = ({userInfo, login}) => {
 
-  let history = useHistory()
-  const { userInfo } = tempMemoryUtil
 
-  const handleSubmit = async loginInfo => {
-    const { username, password } = loginInfo
-    const { data: responseData } = await loginRequest({ username, password })
-    if (responseData.status === 1) {
-      message.warning('账号或者密码错误！')
-    }
-    if (responseData.status === 0) {
-      message.success('登陆成功！')
-      localStorageUtil.saveData('userInfo', responseData.data)
-      tempMemoryUtil.userInfo = responseData.data
-      console.log(tempMemoryUtil.userInfo)
-      history.replace('/')
-    }
+  const handleSubmit = loginInfo => {
+    login(loginInfo)
 
   }
   if (userInfo && userInfo._id) {
@@ -90,4 +76,7 @@ const Login = () => {
 
 
 }
-export default Login
+export default connect(
+  state => ({userInfo: state.userInfo }),
+  {login}
+)(Login)

@@ -2,11 +2,24 @@ import React, { useState, forwardRef, useImperativeHandle } from 'react'
 import { Drawer, Form, Button, Col, Row, Input, message, Select } from 'antd'
 import PropTypes from 'prop-types'
 import { addUserRequest, updateUserRequest } from '../../api'
-import { EyeInvisibleOutlined,EyeTwoTone } from '@ant-design/icons'
+import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons'
+import { connect } from 'react-redux'
+import { logout } from '../../redux/actions'
+
 const { Option } = Select
 
-let UserAddUpdate = (props) => {
-  const { userRef } = props
+let UserAddUpdate = ({
+                       userRef,
+                       userInfo,
+                       onClose,
+                       logout,
+                       drawerVisible,
+                       confirmLoading,
+                       setConfirmLoading,
+                       getUserList,
+                       roleList,
+
+                     }) => {
   const [userId, setUserId] = useState('')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -30,44 +43,48 @@ let UserAddUpdate = (props) => {
 
   // 提交信息
   const handleSubmit = async values => {
-    const { username,password, email, phone, role_id } = values
-    props.setConfirmLoading(true)
+    const { username, password, email, phone, role_id } = values
+    setConfirmLoading(true)
     if (submitType === 'add') {
       const newUserInfo = {
-        username,password, email, phone, role_id
+        username, password, email, phone, role_id
       }
-      const {data:result} = await addUserRequest(newUserInfo)
+      const { data: result } = await addUserRequest(newUserInfo)
       if (result.status === 0) {
         message.success('添加用户成功')
-        props.onClose()
-        props.getUserList()
+        onClose()
+        getUserList()
       } else {
         message.error('添加用户失败，请重试')
       }
     } else {
       const editedUserInfo = {
-        _id:userId, username, email, phone, role_id
+        _id: userId, username, email, phone, role_id
       }
-      const {data:result} = await updateUserRequest(editedUserInfo)
+      const { data: result } = await updateUserRequest(editedUserInfo)
       if (result.status === 0) {
-        message.success('用户信息修改成功')
-        props.onClose()
-        props.getUserList()
+        if (userInfo._id === userId){
+          message.info('当前用户信息已更新，请重新登录')
+          logout()
+        } else {
+          message.success('用户信息修改成功')
+          onClose()
+          getUserList()
+        }
       } else {
         message.error('用户信息修改失败，请重试')
       }
     }
-    props.setConfirmLoading(false)
+    setConfirmLoading(false)
   }
-
 
   return (<Drawer
     title={submitType === 'add' ? '新增用户' : '修改用户'}
     width={720}
     destroyOnClose
     maskClosable={false}
-    onClose={props.onClose}
-    visible={props.drawerVisible}
+    onClose={onClose}
+    visible={drawerVisible}
     bodyStyle={{ paddingBottom: 80 }}
   >
     <Form layout="vertical"
@@ -91,7 +108,7 @@ let UserAddUpdate = (props) => {
             />
           </Form.Item>
         </Col>
-        { submitType === 'add' ? <Col span={12}>
+        {submitType === 'add' ? <Col span={12}>
           <Form.Item
             name="password"
             label="密码"
@@ -103,7 +120,7 @@ let UserAddUpdate = (props) => {
               onChange={(event => {
                 setPassword(event.target.value)
               })}
-              iconRender={visible => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+              iconRender={visible => (visible ? <EyeTwoTone/> : <EyeInvisibleOutlined/>)}
               placeholder="请输入密码"
             />
           </Form.Item>
@@ -154,13 +171,11 @@ let UserAddUpdate = (props) => {
             <Select
               placeholder="请选择角色"
               value={role_id}
-              onChange={(value) => {setRole_id(value)}}
+              onChange={(value) => {
+                setRole_id(value)
+              }}
             >
-              {
-                props.roleList.map(item => (
-                  <Option key={item._id} value={item._id}>{item.name}</Option>
-                ))
-              }
+              {roleList.map(item => (<Option key={item._id} value={item._id}>{item.name}</Option>))}
             </Select>
           </Form.Item>
         </Col>
@@ -168,11 +183,11 @@ let UserAddUpdate = (props) => {
       <Row gutter={16}>
         <Col span={24}>
           <Form.Item>
-            <Button loading={props.confirmLoading} htmlType="submit" style={{ marginRight: 8 }} type="primary">
+            <Button loading={confirmLoading} htmlType="submit" style={{ marginRight: 8 }} type="primary">
               提交
             </Button>
 
-            <Button onClick={props.onClose}>
+            <Button onClick={onClose}>
               取消
             </Button>
           </Form.Item>
@@ -188,11 +203,11 @@ UserAddUpdate.propTypes = {
   confirmLoading: PropTypes.bool.isRequired,
   setConfirmLoading: PropTypes.func.isRequired,
   getUserList: PropTypes.func.isRequired,
-  roleList:PropTypes.array.isRequired
+  roleList: PropTypes.array.isRequired
 
 }
 
 
 const UserAddUpdateRef = forwardRef((props, ref) => (<UserAddUpdate {...props} userRef={ref}/>))
 
-export default UserAddUpdateRef
+export default connect(state => ({ userInfo: state.userInfo }), {logout}, null, { forwardRef: true })(UserAddUpdateRef)

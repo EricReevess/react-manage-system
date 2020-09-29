@@ -1,27 +1,26 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+// import { useLocation } from 'react-router-dom'
 import { Button, Layout, Modal } from 'antd'
-import PropTypes from 'prop-types'
-import tempMemoryUtil from '../../utils/tempMemoryUtil'
 import formattedDateUtil from '../../utils/formattedDateUtil'
 import { cancel, weatherRequest } from '../../api'
-import menuConfig from '../../config/menu-config'
+// import menuConfig from '../../config/menu-config'
 import './index.less'
-import LoadingOutlined from '@ant-design/icons/lib/icons/LoadingOutlined'
+import { LoadingOutlined }from '@ant-design/icons'
+import { connect } from 'react-redux'
+import { logout } from '../../redux/actions'
 const { Header } = Layout
 
-const ContentHeader = (props) => {
-  const location = useLocation()
+
+const ContentHeader = ({ logout,navTitle,userInfo }) => {
+  // const location = useLocation()
   const [localDate] = useState(formattedDateUtil(new Date()))
   const [weatherInfo, setWeatherInfo] = useState({})
   const [visible, setVisible] = useState(false)
-
-
   const getWeatherInfo = async (location) => {
     return await weatherRequest(location)
   }
 
-  const getNavTitle = () => {
+  /*const getNavTitle = () => {
     const { pathname } = location
     let navTitle = ''
     menuConfig.forEach(item => {
@@ -37,12 +36,12 @@ const ContentHeader = (props) => {
       }
     })
     return navTitle
-  }
+  }*/
   const confirmLogout = () => {
     setVisible(true)
   }
   const handleOk = () => {
-    props.logout()
+    logout()
     setVisible(false)
   }
   const handleCancel = () => {
@@ -66,7 +65,7 @@ const ContentHeader = (props) => {
     <Header
       className="content-header">
       <div className="content-header-left">
-        <span className="nav-text">{getNavTitle()}</span>
+        <span className="nav-text">{navTitle}</span>
       </div>
       <div className="content-header-right">
         <span className="header-text" id="header-weather">
@@ -75,7 +74,7 @@ const ContentHeader = (props) => {
           {weatherInfo.dayPictureUrl? <img src={weatherInfo.dayPictureUrl} alt="weather"/> : <LoadingOutlined /> }
           <span>{weatherInfo.weather}</span>
         </span>
-        <span className="header-text">欢迎, {tempMemoryUtil.userInfo.username || undefined}</span>
+        <span className="header-text">欢迎, { userInfo.username || undefined}</span>
         <Button type="primary" onClick={confirmLogout}>登出</Button>
         <Modal
           title="登出"
@@ -92,8 +91,9 @@ const ContentHeader = (props) => {
   </div>)
 
 }
-ContentHeader.propTypes = {
-  logout: PropTypes.func.isRequired
-}
-export default ContentHeader
+
+export default connect(
+  state => ({navTitle:state.navTitle,userInfo:state.userInfo}),
+  {logout}
+)(ContentHeader)
 

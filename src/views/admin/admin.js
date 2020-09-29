@@ -1,22 +1,17 @@
 import React from 'react'
-import tempMemoryUtil from '../../utils/tempMemoryUtil'
 import { Redirect, useHistory } from 'react-router-dom'
 import SiderNav from '../../components/sider-menu'
-import localStorageUtil from '../../utils/localStorageUtil'
 import { Layout, message } from 'antd'
 import ContentHeader from '../../components/content-header'
 import ContentBody from '../../components/content-body'
 import ContentFooter from '../../components/content-footer'
 import './admin.less'
+import { connect } from 'react-redux'
 
-const Admin = () => {
+const Admin = ({userInfo}) => {
   let history = useHistory()
-  const { userInfo } = tempMemoryUtil
-
 
   const logout = () => {
-    localStorageUtil.removeData('userInfo')
-    tempMemoryUtil.userInfo = {}
     message.warn('您已经退出登录了')
     history.replace('/login')
   }
@@ -38,4 +33,7 @@ const Admin = () => {
 
 }
 
-export default Admin
+export default connect(
+  state => ({userInfo: state.userInfo }),
+  {}
+)(Admin)

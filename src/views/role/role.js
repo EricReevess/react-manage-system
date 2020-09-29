@@ -1,14 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { useHistory } from 'react-router-dom'
 import { Button, Card, Input, message, Modal, Space, Table, Tree } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { addRoleRequest, cancel, deleteRoleRequest, getRolesRequest, updateRoleRequest } from '../../api'
 import menuConfig from '../../config/menu-config'
 import localStorageUtil from '../../utils/localStorageUtil'
-import tempMemoryUtil from '../../utils/tempMemoryUtil'
+import { connect } from 'react-redux'
+import { logout } from '../../redux/actions'
 
-const Role = () => {
-  let history = useHistory()
+const Role = ({userInfo, logout}) => {
   const [roleList, setRoleList] = useState([])
   const [tableLoading, setTableLoading] = useState(false)
   const [addRoleVisible, setAddRoleVisible] = useState(false)
@@ -117,10 +116,8 @@ const Role = () => {
     const auth_name = localStorageUtil.getData('userInfo').username
     const { data: result } = await updateRoleRequest({ ...currentRole,auth_name })
     if (result.status === 0) {
-      if (currentRole._id === tempMemoryUtil.userInfo.role_id){
-        tempMemoryUtil.userInfo = {}
-        localStorageUtil.removeData('userInfo')
-        history.go('/login')
+      if (currentRole._id === userInfo.role_id){
+        logout()
         message.info('当前用户角色权限更新，请重新登录')
       } else {
         message.success('更新角色权限成功')
@@ -213,4 +210,7 @@ const Role = () => {
 }
 
 
-export default Role
+export default connect(
+  state => ({userInfo:state.userInfo}),
+  {logout}
+)(Role)

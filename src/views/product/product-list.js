@@ -74,7 +74,7 @@ const ProductList = () => {
   const getProductList =  (pageNum = 1) => {
     setCurrentPageNum(prevState => prevState !== pageNum ? pageNum : prevState)
     setIsLoading(true)
-    getProductListRequest(pageNum, 5).then(value => {
+    getProductListRequest(pageNum, 8).then(value => {
       const { data:result } = value
       if (result.status === 0){
         const {total, list} = result.data
@@ -261,7 +261,7 @@ const ProductList = () => {
         current:currentPageNum,
         total ,
         position: ['bottomCenter'],
-        defaultPageSize: 5,
+        defaultPageSize: 8,
         showQuickJumper: true,
         onChange:getProductList}}
     />

@@ -9,7 +9,7 @@ const loginRequest = loginInfo =>
   ajax('POST', '/login', loginInfo)
 
 const weatherRequest = (location) => {
-  const url = `http://api1.map.baidu.com/telematics/v3/weather?location=${location}&output=json&ak=3p49MVra6urFRGOT9s8UBWr2`
+  const url = `http://api.map.baidu.com/telematics/v3/weather?location=${location}&output=json&ak=3p49MVra6urFRGOT9s8UBWr2`
   return new Promise((resolve) => {
     jsonp(url, {}, (error, data) => {
       if (!error && data.status === 'success') {
